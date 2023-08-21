@@ -15,8 +15,8 @@ pipeline {
         KUBECONFIG_CREDENTIAL_ID = 'demo-kubeconfig'
         REGISTRY = 'docker.io'
         DOCKERHUB_NAMESPACE = 'docker_username'
-        GITHUB_ACCOUNT = 'kubesphere'
-        APP_NAME = 'devops-java-sample'
+        GITHUB_ACCOUNT = 'hank1225'
+        APP_NAME = 'sonar-qube'
     }
 
     stages {
@@ -38,7 +38,7 @@ pipeline {
             steps {
                 container ('maven') {
                     sh 'mvn  -Dmaven.test.skip=true -gs `pwd`/configuration/settings.xml clean package'
-                    sh 'docker build -f Dockerfile-online -t $REGISTRY/$DOCKERHUB_NAMESPACE/$APP_NAME:SNAPSHOT-$BRANCH_NAME-$BUILD_NUMBER .'
+                    sh 'docker build -f Dockerfilenline -t $REGISTRY/$DOCKERHUB_NAMESPACE/$APP_NAME:SNAPSHOT-$BRANCH_NAME-$BUILD_NUMBER .'
                     withCredentials([usernamePassword(passwordVariable : 'DOCKER_PASSWORD' ,usernameVariable : 'DOCKER_USERNAME' ,credentialsId : "$DOCKER_CREDENTIAL_ID" ,)]) {
                         sh 'echo "$DOCKER_PASSWORD" | docker login $REGISTRY -u "$DOCKER_USERNAME" --password-stdin'
                         sh 'docker push  $REGISTRY/$DOCKERHUB_NAMESPACE/$APP_NAME:SNAPSHOT-$BRANCH_NAME-$BUILD_NUMBER'
@@ -65,7 +65,7 @@ pipeline {
           }
           steps {
             input(id: 'deploy-to-dev', message: 'deploy to dev?')
-            kubernetesDeploy(configs: 'deploy/dev-ol/**', enableConfigSubstitution: true, kubeconfigId: "$KUBECONFIG_CREDENTIAL_ID")
+            kubernetesDeploy(configs: 'deploy/devl/**', enableConfigSubstitution: true, kubeconfigId: "$KUBECONFIG_CREDENTIAL_ID")
           }
         }
         stage('push with tag'){
@@ -96,7 +96,7 @@ pipeline {
           }
           steps {
             input(id: 'deploy-to-production', message: 'deploy to production?')
-            kubernetesDeploy(configs: 'deploy/prod-ol/**', enableConfigSubstitution: true, kubeconfigId: "$KUBECONFIG_CREDENTIAL_ID")
+            kubernetesDeploy(configs: 'deploy/prodl/**', enableConfigSubstitution: true, kubeconfigId: "$KUBECONFIG_CREDENTIAL_ID")
           }
         }
     }
